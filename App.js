@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReminderCard from './src/components/ReminderCard';
 import {
   View,
   Text,
@@ -12,6 +13,20 @@ import {
 
 export default function App() {
 
+  // STATE untuk menyimpan data pengingat obat
+  const [reminders, setReminders] = useState([
+    {
+      id: 1,
+      text: 'Paracetamol belum diminum hari ini, jangan lupa minum obat.',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJOZ_ZmUbzk9tahWWxolIOqvkrFNFu9kiU-Q&s',
+    },
+    {
+      id: 2,
+      text: '3 obat sudah diminum hari ini, tunggu sebelum minum lagi.',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwqQ4BwiybUBI8j6VcjHTUo4EAqlBl1BnqMg&s',
+    },
+  ]);
+
   // Fungsi ketika menu ditekan
   const handleMenu = (menu) => {
     Alert.alert('Menu Dipilih', menu);
@@ -20,7 +35,7 @@ export default function App() {
   return (
     <ScrollView style={styles.container}>
 
-      {/* HEADER: NAMA APP + SEARCH */}
+      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.title}>MedReminder</Text>
 
@@ -64,47 +79,30 @@ export default function App() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => handleMenu('Kosultasi')}
+          onPress={() => handleMenu('Konsultasi')}
         >
           <Text style={styles.text}>Web Konsultasi Online</Text>
         </TouchableOpacity>
 
       </View>
 
-      {/* ILUSTRASI BAWAH */}
-      <View style={styles.bottomSection}>
-        <Text style={styles.sectionTitle}>Pengingat</Text>
+      {/* SECTION PENGINGAT */}
+      <Text style={styles.sectionTitle}>Pengingat</Text>
 
-        <Image
-          style={styles.bottomImage}
-          source={{
-            uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJOZ_ZmUbzk9tahWWxolIOqvkrFNFu9kiU-Q&s'
-          }}
+      {/* LOOP DATA STATE + KIRIM PROPS */}
+      {reminders.map((item) => (
+        <ReminderCard
+          key={item.id}
+          image={item.image}
+          text={item.text}
         />
-
-        <Text style={styles.desc}>
-          Paracetamol belum diminum hari ini, jangan lupa untuk minum obat teratur.
-        </Text>
-      </View>
-
-      <View style={styles.bottomSection}>
-        <Image
-          style={styles.bottomImage}
-          source={{
-            uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwqQ4BwiybUBI8j6VcjHTUo4EAqlBl1BnqMg&s'
-          }}
-        />
-
-        <Text style={styles.desc}>
-          3 obat sudah diminum hari ini, tunggu beberapa jam sebelum meminum obat yang lain.
-        </Text>
-      </View>
+      ))}
 
     </ScrollView>
   );
 }
 
-// STYLE
+// STYLE (tidak berubah)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -113,7 +111,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  // HEADER
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -134,7 +131,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // BANNER
   banner: {
     width: '100%',
     height: 140,
@@ -142,7 +138,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  // GRID
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -164,27 +159,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // BAWAH
-  bottomSection: {
-    marginTop: 10,
-    marginBottom: 30,
-  },
-
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 10,
-  },
-
-  bottomImage: {
-    width: '100%',
-    height: 140,
-    borderRadius: 15,
-    marginBottom: 8,
-  },
-
-  desc: {
-    fontSize: 12,
-    color: '#666',
   },
 });
