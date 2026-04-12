@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
-// Komponen ReminderCard menerima props dari App.js
 const ReminderCard = ({ image, text }) => {
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={{ uri: image }} />
+      <Image source={{ uri: image }} style={styles.image} />
       <Text style={styles.text}>{text}</Text>
     </View>
   );
@@ -13,10 +12,8 @@ const ReminderCard = ({ image, text }) => {
 
 export default ReminderCard;
 
-// Style khusus komponen ini
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
     marginBottom: 20,
   },
   image: {
