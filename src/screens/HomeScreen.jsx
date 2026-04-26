@@ -15,13 +15,18 @@ import ReminderCard from '../components/reminderCard.jsx';
 import { menuData } from '../data/menuData';
 import { reminderData } from '../data/reminderData';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
 
-  // STATE (biar sesuai tugas)
   const [reminders, setReminders] = useState(reminderData);
 
   const handleMenu = (menu) => {
-    Alert.alert('Menu Dipilih', menu);
+    if (menu === 'Lihat Jadwal') {
+      navigation.navigate('Schedule');
+    } else if (menu === 'Tambah Jadwal') {
+      navigation.navigate('AddSchedule');
+    } else {
+      Alert.alert('Menu Dipilih', menu);
+    }
   };
 
   return (
@@ -29,7 +34,6 @@ const HomeScreen = () => {
 
       <Header />
 
-      {/* BANNER */}
       <Image
         style={styles.banner}
         source={{
@@ -37,7 +41,6 @@ const HomeScreen = () => {
         }}
       />
 
-      {/* MENU */}
       <View style={styles.grid}>
         {menuData.map(item => (
           <MenuCard
@@ -48,7 +51,6 @@ const HomeScreen = () => {
         ))}
       </View>
 
-      {/* PENGINGAT */}
       <Text style={styles.sectionTitle}>Pengingat</Text>
 
       {reminders.map(item => (

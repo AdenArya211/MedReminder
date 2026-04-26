@@ -1,4 +1,6 @@
-import ScheduleScreen from './src/screens/ScheduleScreen';
+import React from 'react';
+import AppNavigator from './src/navigation/AppNavigator';
+
 export default function App() {
-  return <ScheduleScreen/>;
+  return <AppNavigator />;
 }

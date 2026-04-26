@@ -9,7 +9,7 @@ import {
 
 import InputField from '../components/InputField';
 
-const AddScheduleScreen = () => {
+const AddScheduleScreen = ({ navigation }) => {
 
   const [nama, setNama] = useState('');
   const [dosis, setDosis] = useState('');
@@ -17,6 +17,7 @@ const AddScheduleScreen = () => {
 
   const handleAdd = () => {
     Alert.alert('Berhasil', `${nama} ditambahkan`);
+    navigation.goBack(); // kembali ke Schedule
   };
 
   return (

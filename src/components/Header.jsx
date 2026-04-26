@@ -16,11 +16,6 @@ const Header = () => {
       {/* BARIS ATAS */}
       <View style={styles.topRow}>
         <Text style={styles.title}>MedReminder</Text>
-
-        {/* ICON PROFILE */}
-        <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={28} color="#333" />
-        </TouchableOpacity>
       </View>
 
       {/* SEARCH BAR */}
