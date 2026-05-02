@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   View,
   Text,
   Alert,
+  Animated,
 } from 'react-native';
 
 import Header from '../components/Header';
@@ -17,7 +18,26 @@ import { reminderData } from '../data/reminderData';
 
 const HomeScreen = ({ navigation }) => {
 
-  const [reminders, setReminders] = useState(reminderData);
+  const [reminders] = useState(reminderData);
+
+  // ANIMASI
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const handleMenu = (menu) => {
     if (menu === 'Lihat Jadwal') {
@@ -34,32 +54,55 @@ const HomeScreen = ({ navigation }) => {
 
       <Header />
 
-      <Image
-        style={styles.banner}
+      {/* Banner Animasi */}
+      <Animated.Image
+        style={[
+          styles.banner,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
         source={{
           uri: 'https://img.freepik.com/free-vector/tiny-pharmacists-with-prescription-drugs-patients-pharmaceutical-industry-rx-symbol-bottle-painkillers-flat-vector-illustration-pharmacy-medicine-health-concept-banner_74855-25358.jpg'
         }}
       />
 
-      <View style={styles.grid}>
-        {menuData.map(item => (
-          <MenuCard
-            key={item.id}
-            title={item.title}
-            onPress={() => handleMenu(item.title)}
-          />
-        ))}
-      </View>
+      {/* Menu Animasi */}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        <View style={styles.grid}>
+          {menuData.map(item => (
+            <MenuCard
+              key={item.id}
+              title={item.title}
+              onPress={() => handleMenu(item.title)}
+            />
+          ))}
+        </View>
+      </Animated.View>
 
       <Text style={styles.sectionTitle}>Pengingat</Text>
 
-      {reminders.map(item => (
-        <ReminderCard
-          key={item.id}
-          image={item.image}
-          text={item.text}
-        />
-      ))}
+      {/* Reminder Animasi */}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        {reminders.map(item => (
+          <ReminderCard
+            key={item.id}
+            image={item.image}
+            text={item.text}
+          />
+        ))}
+      </Animated.View>
 
     </ScrollView>
   );

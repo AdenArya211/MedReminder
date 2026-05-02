@@ -1,38 +1,64 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   ScrollView,
   Text,
   StyleSheet,
   TouchableOpacity,
   View,
+  Animated,
 } from 'react-native';
 
 import ScheduleItem from '../components/ScheduleItem';
 import { scheduleData } from '../data/scheduleData';
 
 const ScheduleScreen = ({ navigation }) => {
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
 
       <Text style={styles.title}>Jadwal Obat</Text>
 
-      <View style={{ marginBottom: 15 }}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddSchedule')}
-        >
-          <Text style={styles.addText}>+ Tambah Jadwal</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('AddSchedule')}
+      >
+        <Text style={styles.addText}>+ Tambah Jadwal</Text>
+      </TouchableOpacity>
 
-      {scheduleData.map(item => (
-        <ScheduleItem
-          key={item.id}
-          nama={item.nama}
-          dosis={item.dosis}
-          waktu={item.waktu}
-        />
-      ))}
+      {/* Animasi List */}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        {scheduleData.map(item => (
+          <ScheduleItem
+            key={item.id}
+            nama={item.nama}
+            dosis={item.dosis}
+            waktu={item.waktu}
+          />
+        ))}
+      </Animated.View>
 
     </ScrollView>
   );
@@ -57,6 +83,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 15,
   },
   addText: {
     color: '#fff',
