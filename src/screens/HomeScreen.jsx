@@ -40,13 +40,18 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   const handleMenu = (menu) => {
-    if (menu === 'Lihat Jadwal') {
-      navigation.navigate('Schedule');
-    } else if (menu === 'Tambah Jadwal') {
-      navigation.navigate('AddSchedule');
-    } else {
-      Alert.alert('Menu Dipilih', menu);
-    }
+      if (menu === 'Lihat Jadwal') {
+    navigation.navigate('Schedule');
+
+  } else if (menu === 'Tambah Jadwal') {
+    navigation.navigate('AddSchedule');
+
+  } else if (menu === 'Tipe Obat') {
+    navigation.navigate('MedicineType');
+
+  } else {
+    Alert.alert('Menu Dipilih', menu);
+  }
   };
 
   return (
