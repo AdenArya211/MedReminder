@@ -1,22 +1,99 @@
-import React, { useRef, useEffect } from 'react';
+import React, {
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
+
 import {
   ScrollView,
   Text,
   StyleSheet,
   TouchableOpacity,
-  View,
   Animated,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 
+import { useFocusEffect } from '@react-navigation/native';
+
 import ScheduleItem from '../components/ScheduleItem';
-import { scheduleData } from '../data/scheduleData';
 
 const ScheduleScreen = ({ navigation }) => {
 
+  // STATE API
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ANIMASI
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
-  useEffect(() => {
+  // GET API
+  const getSchedules = async () => {
+    try {
+      const response = await fetch(
+        'https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedule'
+      );
+
+      const data = await response.json();
+      setSchedules(data);
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+const deleteSchedule = async (id) => {
+
+  try {
+
+    const response = await fetch(
+      `https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedules/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const result = await response.json();
+
+    console.log('DELETE RESULT:', result);
+
+    getSchedules();
+
+  } catch (error) {
+    console.log('DELETE ERROR:', error);
+  }
+};
+
+const handleDelete = (id, nama) => {
+
+  Alert.alert(
+    'Hapus Jadwal',
+    `Yakin ingin menghapus ${nama}?`,
+    [
+      {
+        text: 'Batal',
+        style: 'cancel',
+      },
+      {
+        text: 'Hapus',
+        onPress: async () => {
+  await deleteSchedule(id);
+},
+      },
+    ]
+  );
+};
+
+useFocusEffect(
+  useCallback(() => {
+
+    getSchedules();
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -29,7 +106,9 @@ const ScheduleScreen = ({ navigation }) => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+
+  }, [])
+);
 
   return (
     <ScrollView style={styles.container}>
@@ -43,22 +122,41 @@ const ScheduleScreen = ({ navigation }) => {
         <Text style={styles.addText}>+ Tambah Jadwal</Text>
       </TouchableOpacity>
 
-      {/* Animasi List */}
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-        }}
-      >
-        {scheduleData.map(item => (
-          <ScheduleItem
-            key={item.id}
-            nama={item.nama}
-            dosis={item.dosis}
-            waktu={item.waktu}
-          />
-        ))}
-      </Animated.View>
+      {/* LOADING */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#2f95baff" />
+      ) : (
+
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }}
+        >
+
+          {Array.isArray(schedules) &&
+  schedules.map(item => (
+
+    <TouchableOpacity
+      key={String(item.id)}
+      onLongPress={() =>
+      handleDelete(String(item.id), item.nama)
+    }
+    >
+
+      <ScheduleItem
+        nama={item.nama}
+        dosis={item.dosis}
+        waktu={item.waktu}
+      />
+
+    </TouchableOpacity>
+
+))}
+
+        </Animated.View>
+
+      )}
 
     </ScrollView>
   );
@@ -73,11 +171,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
   },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
   },
+
   addButton: {
     backgroundColor: '#2f95baff',
     padding: 10,
@@ -85,6 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
+
   addText: {
     color: '#fff',
     fontWeight: 'bold',

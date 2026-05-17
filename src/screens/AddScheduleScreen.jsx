@@ -15,9 +15,39 @@ const AddScheduleScreen = ({ navigation }) => {
   const [dosis, setDosis] = useState('');
   const [waktu, setWaktu] = useState('');
 
-  const handleAdd = () => {
-    Alert.alert('Berhasil', `${nama} ditambahkan`);
-    navigation.goBack(); // kembali ke Schedule
+  // POST API
+  const handleAdd = async () => {
+
+    if (nama === '' || dosis === '' || waktu === '') {
+      Alert.alert('Error', 'Semua field harus diisi');
+      return;
+    }
+
+    try {
+
+      await fetch(
+        'https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedule',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            nama,
+            dosis,
+            waktu,
+          }),
+        }
+      );
+
+      Alert.alert('Berhasil', `${nama} ditambahkan`);
+
+      navigation.goBack();
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Error', 'Gagal menambahkan data');
+    }
   };
 
   return (
@@ -25,11 +55,28 @@ const AddScheduleScreen = ({ navigation }) => {
 
       <Text style={styles.title}>Tambah Jadwal</Text>
 
-      <InputField placeholder="Nama Obat" value={nama} onChangeText={setNama} />
-      <InputField placeholder="Dosis" value={dosis} onChangeText={setDosis} />
-      <InputField placeholder="Waktu" value={waktu} onChangeText={setWaktu} />
+      <InputField
+        placeholder="Nama Obat"
+        value={nama}
+        onChangeText={setNama}
+      />
 
-      <TouchableOpacity style={styles.button} onPress={handleAdd}>
+      <InputField
+        placeholder="Dosis"
+        value={dosis}
+        onChangeText={setDosis}
+      />
+
+      <InputField
+        placeholder="Waktu"
+        value={waktu}
+        onChangeText={setWaktu}
+      />
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleAdd}
+      >
         <Text style={styles.buttonText}>Tambah Jadwal</Text>
       </TouchableOpacity>
 
@@ -46,17 +93,20 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
   },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
   },
+
   button: {
     backgroundColor: '#2f95baff',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
+
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
