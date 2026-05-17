@@ -9,6 +9,7 @@ import AddScheduleScreen from '../screens/AddScheduleScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import MedicineTypeScreen from '../screens/MedicineTypeScreen';
+import EditScheduleScreen from '../screens/EditScheduleScreen';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -47,6 +48,11 @@ export default function AppNavigator() {
           name="MedicineType"
           component={MedicineTypeScreen}
           options={{ title: 'Tipe Obat' }}
+        />
+        <Stack.Screen
+          name="EditSchedule"
+          component={EditScheduleScreen}
+          options={{ title: 'Edit Jadwal' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
