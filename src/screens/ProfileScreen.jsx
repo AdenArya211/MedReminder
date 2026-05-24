@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
 import {
   View,
   Text,
@@ -8,22 +9,55 @@ import {
   Alert,
 } from 'react-native';
 
-import { profileData } from '../data/profileData';
+import { supabase } from '../services/supabase';
 
 const ProfileScreen = ({ navigation }) => {
+
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      setUserData(user);
+    }
+  };
+
+  const handleLogout = async () => {
+
+    await supabase.auth.signOut();
+
+    Alert.alert('Logout Berhasil');
+
+    navigation.replace('Login');
+  };
+
   return (
     <View style={styles.container}>
 
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
 
-        <TouchableOpacity onPress={() => Alert.alert('Settings')}>
+        <Text style={styles.title}>
+          Profile
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => Alert.alert('Settings')}
+        >
           <Text style={styles.setting}>⚙️</Text>
         </TouchableOpacity>
+
       </View>
 
-      {/* FOTO PROFIL */}
+      {/* FOTO */}
       <Image
         style={styles.avatar}
         source={{
@@ -31,55 +65,61 @@ const ProfileScreen = ({ navigation }) => {
         }}
       />
 
-      {/* NAMA */}
-      <Text style={styles.name}>{profileData.nama}</Text>
+      {/* NAMA USER */}
+      <Text style={styles.name}>
+        {userData?.user_metadata?.nama || 'User'}
+      </Text>
 
-      {/* EMAIL */}
-      <Text style={styles.email}>aden@gmail.com</Text>
+      {/* EMAIL USER */}
+      <Text style={styles.email}>
+        {userData?.email}
+      </Text>
 
-      {/* BUTTON EDIT */}
+      {/* BUTTON */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => Alert.alert('Edit Profile')}
       >
-        <Text style={styles.buttonText}>Edit Profile</Text>
+        <Text style={styles.buttonText}>
+          Edit Profile
+        </Text>
       </TouchableOpacity>
-
-      {/* STATISTIK */}
-      <View style={styles.card}>
-
-        <Text style={styles.cardTitle}>📊 Statistik</Text>
-
-        <Text style={styles.info}>Total Jadwal : 12</Text>
-        <Text style={styles.info}>Obat Aktif : 5</Text>
-        <Text style={styles.info}>Pengingat Hari Ini : 3</Text>
-
-      </View>
 
       {/* MENU */}
       <View style={styles.card}>
 
-        <Text style={styles.cardTitle}>⚙️ Menu</Text>
+        <Text style={styles.cardTitle}>
+          ⚙️ Menu
+        </Text>
 
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => Alert.alert('Tentang Aplikasi')}
         >
-          <Text style={styles.menuText}>ℹ️ Tentang Aplikasi</Text>
+          <Text style={styles.menuText}>
+            ℹ️ Tentang Aplikasi
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => Alert.alert('Bantuan')}
         >
-          <Text style={styles.menuText}>❓ Bantuan</Text>
+          <Text style={styles.menuText}>
+            ❓ Bantuan
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => Alert.alert('Logout Berhasil')}
+          onPress={handleLogout}
         >
-          <Text style={[styles.menuText, { color: 'red' }]}>
+          <Text
+            style={[
+              styles.menuText,
+              { color: 'red' }
+            ]}
+          >
             🚪 Logout
           </Text>
         </TouchableOpacity>
@@ -98,6 +138,7 @@ const ProfileScreen = ({ navigation }) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',
@@ -187,4 +228,5 @@ const styles = StyleSheet.create({
     color: 'gray',
     textAlign: 'center',
   },
+
 });

@@ -17,71 +17,50 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 
 import ScheduleItem from '../components/ScheduleItem';
+import { supabase } from '../services/supabase';
 
 const ScheduleScreen = ({ navigation }) => {
 
-  // API URL
-  const API_URL =
-    'https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedule';
-
-  // STATE
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ANIMATION
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
-  // GET API
   const getSchedules = async () => {
+    setLoading(true);
 
-    try {
+    const { data, error } = await supabase
+      .from('schedule')
+      .select('*')
+      .order('id', { ascending: true });
 
-      const response = await fetch(API_URL);
-
-      const data = await response.json();
-
+    if (error) {
+      console.log('GET ERROR:', error.message);
+      Alert.alert('Error', 'Gagal mengambil data');
+    } else {
       setSchedules(data);
-
-    } catch (error) {
-
-      console.log('GET ERROR:', error);
-
-    } finally {
-
-      setLoading(false);
-
     }
+
+    setLoading(false);
   };
 
-  // DELETE API
   const deleteSchedule = async (id) => {
+    const { error } = await supabase
+      .from('schedule')
+      .delete()
+      .eq('id', id);
 
-    try {
-
-      const response = await fetch(
-        `${API_URL}/${id}`,
-        {
-          method: 'DELETE',
-        }
-      );
-
-      const result = await response.json();
-
-      console.log('DELETE RESULT:', result);
-
+    if (error) {
+      console.log('DELETE ERROR:', error.message);
+      Alert.alert('Error', 'Gagal menghapus data');
+    } else {
+      Alert.alert('Berhasil', 'Data berhasil dihapus');
       getSchedules();
-
-    } catch (error) {
-
-      console.log('DELETE ERROR:', error);
-
     }
   };
 
-  // HANDLE DELETE
   const handleDelete = (id, nama) => {
-
     Alert.alert(
       'Hapus Jadwal',
       `Yakin ingin menghapus ${nama}?`,
@@ -92,27 +71,18 @@ const ScheduleScreen = ({ navigation }) => {
         },
         {
           text: 'Hapus',
-          onPress: async () => {
-            await deleteSchedule(id);
-          },
+          onPress: () => deleteSchedule(id),
         },
       ]
     );
   };
 
-  // HANDLE EDIT
   const handleEdit = (item) => {
-
-    navigation.navigate(
-      'EditSchedule',
-      { item }
-    );
+    navigation.navigate('EditSchedule', { item });
   };
 
-  // REFRESH SCREEN
   useFocusEffect(
     useCallback(() => {
-
       getSchedules();
 
       Animated.parallel([
@@ -121,88 +91,50 @@ const ScheduleScreen = ({ navigation }) => {
           duration: 800,
           useNativeDriver: true,
         }),
-
         Animated.timing(slideAnim, {
           toValue: 0,
           duration: 800,
           useNativeDriver: true,
         }),
-
       ]).start();
-
     }, [])
   );
 
   return (
     <ScrollView style={styles.container}>
 
-      <Text style={styles.title}>
-        Jadwal Obat
-      </Text>
+      <Text style={styles.title}>Jadwal Obat</Text>
 
-      {/* BUTTON TAMBAH */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() =>
-          navigation.navigate('AddSchedule')
-        }
+        onPress={() => navigation.navigate('AddSchedule')}
       >
-        <Text style={styles.addText}>
-          + Tambah Jadwal
-        </Text>
+        <Text style={styles.addText}>+ Tambah Jadwal</Text>
       </TouchableOpacity>
 
-      {/* LOADING */}
       {loading ? (
-
-        <ActivityIndicator
-          size="large"
-          color="#2f95baff"
-        />
-
+        <ActivityIndicator size="large" color="#2f95baff" />
       ) : (
-
         <Animated.View
           style={{
             opacity: fadeAnim,
-            transform: [
-              { translateY: slideAnim }
-            ],
+            transform: [{ translateY: slideAnim }],
           }}
         >
-
-          {Array.isArray(schedules) &&
-            schedules.map(item => (
-
-              <TouchableOpacity
-                key={String(item.id)}
-
-                // TEKAN BIASA = EDIT
-                onPress={() =>
-                  handleEdit(item)
-                }
-
-                // TEKAN LAMA = DELETE
-                onLongPress={() =>
-                  handleDelete(
-                    String(item.id),
-                    item.nama
-                  )
-                }
-              >
-
-                <ScheduleItem
-                  nama={item.nama}
-                  dosis={item.dosis}
-                  waktu={item.waktu}
-                />
-
-              </TouchableOpacity>
-
-            ))}
-
+          {schedules.map(item => (
+            <TouchableOpacity
+              key={String(item.id)}
+              onPress={() => handleEdit(item)}
+              onLongPress={() => handleDelete(item.id, item.nama)}
+            >
+              <ScheduleItem
+                nama={item.nama}
+                dosis={item.dosis}
+                waktu={item.waktu}
+              />
+            </TouchableOpacity>
+          ))}
         </Animated.View>
-
       )}
 
     </ScrollView>
@@ -212,7 +144,6 @@ const ScheduleScreen = ({ navigation }) => {
 export default ScheduleScreen;
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',
@@ -238,5 +169,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-
 });

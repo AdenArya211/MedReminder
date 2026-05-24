@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import InputField from '../components/InputField';
+import { supabase } from '../services/supabase';
 
 const AddScheduleScreen = ({ navigation }) => {
 
@@ -15,39 +16,30 @@ const AddScheduleScreen = ({ navigation }) => {
   const [dosis, setDosis] = useState('');
   const [waktu, setWaktu] = useState('');
 
-  // POST API
   const handleAdd = async () => {
-
     if (nama === '' || dosis === '' || waktu === '') {
       Alert.alert('Error', 'Semua field harus diisi');
       return;
     }
 
-    try {
-
-      await fetch(
-        'https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedule',
+    const { error } = await supabase
+      .from('schedule')
+      .insert([
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            nama,
-            dosis,
-            waktu,
-          }),
-        }
-      );
+          nama: nama,
+          dosis: dosis,
+          waktu: waktu,
+        },
+      ]);
 
-      Alert.alert('Berhasil', `${nama} ditambahkan`);
-
-      navigation.goBack();
-
-    } catch (error) {
-      console.log(error);
+    if (error) {
+      console.log('INSERT ERROR:', error.message);
       Alert.alert('Error', 'Gagal menambahkan data');
+      return;
     }
+
+    Alert.alert('Berhasil', `${nama} ditambahkan`);
+    navigation.goBack();
   };
 
   return (
@@ -73,10 +65,7 @@ const AddScheduleScreen = ({ navigation }) => {
         onChangeText={setWaktu}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleAdd}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleAdd}>
         <Text style={styles.buttonText}>Tambah Jadwal</Text>
       </TouchableOpacity>
 

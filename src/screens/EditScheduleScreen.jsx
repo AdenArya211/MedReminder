@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
- StyleSheet,
+  StyleSheet,
   TouchableOpacity,
   Alert,
 } from 'react-native';
 
 import InputField from '../components/InputField';
+import { supabase } from '../services/supabase';
 
 const EditScheduleScreen = ({ route, navigation }) => {
 
@@ -18,39 +19,29 @@ const EditScheduleScreen = ({ route, navigation }) => {
   const [dosis, setDosis] = useState(item.dosis);
   const [waktu, setWaktu] = useState(item.waktu);
 
-  // UPDATE API
   const handleUpdate = async () => {
-
     if (nama === '' || dosis === '' || waktu === '') {
       Alert.alert('Error', 'Semua field harus diisi');
       return;
     }
 
-    try {
+    const { error } = await supabase
+      .from('schedule')
+      .update({
+        nama: nama,
+        dosis: dosis,
+        waktu: waktu,
+      })
+      .eq('id', item.id);
 
-      await fetch(
-        `https://6a0192ec36fb6ad04de12f3a.mockapi.io/schedule/${item.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            nama,
-            dosis,
-            waktu,
-          }),
-        }
-      );
-
-      Alert.alert('Berhasil', 'Jadwal berhasil diupdate');
-
-      navigation.goBack();
-
-    } catch (error) {
-      console.log(error);
+    if (error) {
+      console.log('UPDATE ERROR:', error.message);
       Alert.alert('Error', 'Gagal update data');
+      return;
     }
+
+    Alert.alert('Berhasil', 'Jadwal berhasil diupdate');
+    navigation.goBack();
   };
 
   return (

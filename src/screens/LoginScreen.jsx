@@ -8,14 +8,26 @@ import {
   Alert,
 } from 'react-native';
 
+import { supabase } from '../services/supabase';
+
 const LoginScreen = ({ navigation }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email === '' || password === '') {
       Alert.alert('Error', 'Semua field harus diisi');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      Alert.alert('Login Gagal', error.message);
       return;
     }
 
@@ -33,6 +45,7 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Masukkan Email"
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
 
       <TextInput

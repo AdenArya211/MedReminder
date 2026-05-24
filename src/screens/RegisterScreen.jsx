@@ -8,6 +8,8 @@ import {
   Alert,
 } from 'react-native';
 
+import { supabase } from '../services/supabase';
+
 const RegisterScreen = ({ navigation }) => {
 
   const [nama, setNama] = useState('');
@@ -15,7 +17,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
 
     if (
       nama === '' ||
@@ -32,7 +34,22 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    Alert.alert('Registrasi Berhasil');
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          nama: nama,
+        },
+      },
+    });
+
+    if (error) {
+      Alert.alert('Registrasi Gagal', error.message);
+      return;
+    }
+
+    Alert.alert('Registrasi Berhasil', 'Silakan login menggunakan akun yang sudah dibuat');
     navigation.goBack();
   };
 
@@ -53,6 +70,7 @@ const RegisterScreen = ({ navigation }) => {
         placeholder="Masukkan Email"
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
 
       <TextInput
